@@ -1,0 +1,19 @@
+@import 'partials/_variables.scss';
+
+.clearfix::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+.flex-wrapper {
+  display: flex;
+  justify-content:space-between;
+}
+
+a {
+  cursor: pointer;
+}
+
+@import 'partials/_layout.scss';
+@import 'partials/_typography.scss';

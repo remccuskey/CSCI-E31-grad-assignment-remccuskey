@@ -1,0 +1,30 @@
+{
+  "name": "csci-e31-grad-assignment-remccuskey",
+  "version": "1.0.0",
+  "description": "installing sass",
+  "scripts": {
+    "start": "node ./bin/www",
+    "start-dev": "{ gulp watch & nodemon --inspect ./bin/www & }"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/remccuskey/CSCI-E31-grad-assignment-remccuskey.git"
+  },
+  "author": "Reina McCuskey",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/remccuskey/CSCI-E31-grad-assignment-remccuskey/issues"
+  },
+  "homepage": "https://github.com/remccuskey/CSCI-E31-grad-assignment-remccuskey#README",
+  "dependencies": {
+    "express": "^4.17.1",
+    "gulp": "^4.0.2",
+    "gulp-sass": "^4.1.0",
+    "gulp-sourcemaps": "^3.0.0",
+    "node-sass": "^4.14.1",
+    "nodemon": "^2.0.7",
+    "pug": "^3.0.2",
+    "serve-static": "^1.14.1"
+  },
+  "main": "app.js"
+}

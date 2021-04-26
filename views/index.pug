@@ -1,0 +1,114 @@
+extends layout
+
+block main-content
+  .main-content
+    h1 Setting up an Automated SASS Workflow in a Node.js Project
+    p As a UX/UI Designer/Developer, I am often tasked with setting up and coding the site's stylesheets in a Visual Studio ASP.NET environment. I rarely touch code outside of the HTML or SASS files, though I may be tempted with everything I've learned this semester.
+    p Currently, I am using the SASS preprocessor because it allows me to use features not available in CSS, like nesting, variables, extends and modules, which in turn makes it so much easier to maintain and scale the code. However, we really haven't touched on setting up a SASS environment within Node.js.
+    p Therefore, I thought it would be helpful to others in a similar designer/developer position to document the process of adding an automated SASS workflow to an existing Node.js project.
+    p A couple of caveats:
+      ul
+        li I work in a Mac environment, and so the following instructions apply only to that environment.
+        li I chose to install the gulp-sass dependency, because I was interested in the automation capabilities of gulp.js. You may want to explore other flavors of SASS such as
+          a(href="http://compass-style.org/") Compass
+          span.separator or
+          a(href="https://sass-lang.com/dart-sass") Dart
+        li As has been mentioned, these instructions do not detail the process of setting up a Node.js project. For that, I highly recommend that you take Harvard's CSCI-E31 course!
+
+    section.step
+      h2 Step 1&mdash;Make sure Xcode and Xcode Command Line Tools are installed
+      p They are required for use with Gulp. You can download Xcode from the App store, but make sure your OS is compatible with the Xcode version you download. I'm running mac OS Catalina (10.15.7), so I needed to download Xcode version 11.
+      p Once downloaded, launch Xcode to make sure it's installed. Then open a terminal window and navigate to your project folder to install the Command Line Tools with:
+        code $xcode-select --install
+        span followed by:
+        code $sudo xcode-select --switch /Library/Developer/CommandLineTools
+        span to enable the command line tools.
+    section.step
+      h2 Step 2&mdash;Install Gulp and dependencies
+      p Next, we first need to install the Gulp command line tools globally:
+        code $sudo npm install -g gulp-cli
+      p and then install each of the Gulp dependencies
+        code $npm install gulp
+        code $npm install gulp-sass
+        code $npm install gulp-sourcemaps
+        code $npm install node-sass #to compile the sass
+      p
+      i Note: gulp-sourcemaps will map your sass code to the generated css and node-sass is used to compile the sass.
+    section.step
+      h2 Step 3&mdash;Create the Gulpfile.js file
+      p Now we need to create a gulpfile.js to house the tasks we'd like to automate. This file should be at your project's root directory where the app.js and package.json files are located.
+      p My file contains two tasks: one to identify the source sass files and destination css files, map the code between sass and css and log any errors, and the second to watch for changes to sass files while the app is running.
+        pre
+          code.
+            'use strict';
+
+            const gulp = require('gulp');
+            const sass = require('gulp-sass');
+            const sourcemaps = require('gulp-sourcemaps');
+
+            sass.compiler = require('node-sass');
+
+
+            gulp.task('sass', function () {
+             return gulp.src('/public/styles/sass/styles.scss', {allowEmpty: true})
+              .pipe(sourcemaps.init())
+              .pipe(sass().on('error', sass.logError))
+              .pipe(sourcemaps.write())
+              .pipe(gulp.dest('/public/styles/css'));
+            });
+
+            gulp.task('watch', function () {
+              gulp.watch('/public/styles/sass/**/*.scss', gulp.series('sass'));
+            });
+
+    section.step
+      h2 Step 4&mdash;Create your SASS files
+      p At a minimum you'll need a single sass file that contains your styles to compile to a corresponding css file.
+      p My simplified styles structure has partials which contain specific modules such as layout, typography and variables feeding into a base file which in turn feeds into a styles file, which is compiled into the styles.css file.
+        pre
+          code.
+            • styles
+              • css
+                  styles.css
+              • sass
+                base.scss
+                styles.scss
+                • partials
+                    _layout.scss
+                    _typography.scss
+                    _variables.scss
+
+    section.step
+      h2 Step 5&mdash;Test in command line
+      p We can test to make sure that the files are compiling by calling the gulpfile.js sass function on the command line:
+        code $gulp sass
+      p You should see something like this:
+        pre
+          code.
+            [19:49:10] Using gulpfile ~/CSCI-E31/CSCI-E31-grad-assignment-remccuskey/gulpfile.js
+            [19:49:10] Starting 'sass'...
+            [19:49:10] Finished 'sass' after 15 ms
+      p If you want to test the watch function, type the following in the command line:
+        code $gulp watch
+      p You should see a 'Starting watch' message in the terminal. Making changes to your sass files should now return the starting/finishing messages you saw when you ran the gulp sass function.
+    section.step
+      h2 Step 6&mdash;Check PUG template reference
+      p One issue I had when working with the pug template engine was getting it to recognize an external css stylesheet without having to use 'include' to render an internal style element. Unlike other external css stylesheets, you cannot use the link element to point to the file.
+      p You will need to use the 'block styles' syntax to access the file, like so:
+        pre
+          code.
+            block styles
+              link(rel="stylesheet" type="text/css" href="/styles/css/styles.css")
+    section.step
+      h2 Step 7&mdash;Modify Package.json
+      p The final step is to automate the process at startup. I focused on the start-dev script, because the start script, presumably would be used in production and not require the recompilation or watching of sass files.
+      p To modify the start-dev script in your package.json to run the gulp watch and nodemon concurrently, change the scripts section as follows:
+        pre
+          code.
+            "scripts": {
+              "start": "node ./bin/www",
+              "start-dev": "{ gulp watch & nodemon --inspect ./bin/www & }"
+            }
+    section.step
+      h2 That's it!
+      p I hope you've found this useful. Good luck!
